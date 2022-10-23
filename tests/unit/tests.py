@@ -1,5 +1,6 @@
 import os
 import pickle
+import random
 import unittest
 from pathlib import Path
 
@@ -126,6 +127,110 @@ class TestMatrixGeneration(unittest.TestCase):
                 self.assertEqual(true_shape, test_shape)
                 self.assertEqual(true_type_str, test_type_str)
 
+    @classmethod
+    def setUp(cls) -> None:
+
+        # generating file names
+        cls.single_mat = "single_mat.pickle"
+        cls.file_exists = "file_exists.csv"
+
+        # generating datasets
+        with open(cls.single_mat, "wb") as mat_file:
+            mat = np.random.rand(10, 10)
+            pickle.dump(mat, mat_file)
+
+        # generates an empty file
+        with open(cls.file_exists, "w") as f:
+            f.write("file exists")
+
+    @classmethod
+    def tearDown(cls) -> None:
+        os.remove(cls.single_mat)
+        os.remove(cls.file_exists)
+
+
+# TODO: Finish loader function
+class TestIO(unittest.TestCase):
+    """Test class focuses on reading and writing files"""
+
+    def test_type_converts_1(self) -> None:
+        """Converts all entries within rows to it's appropriate types"""
+
+        unformated_conts = [
+            ["6.4", "8.4", "2.2", "6.8", "Iris-setosa"],
+            ["5.9", "1.3", "2.3", "8.6", "Iris-setosa"],
+            ["4.2", "8.1", "8.6", "9.0", "Iris-versicolor"],
+            ["3.8", "11.6", "4.0", "3.0", "Iris-versicolor"],
+            ["6.0", "7.3", "12.7", "2.8", "Iris-virginica"],
+            ["10.3", "5.8", "1.5", "7.7", "Iris-virginica"],
+        ]
+
+        expected_formatted_conts = [
+            [6.4, 8.4, 2.2, 6.8, "Iris-setosa"],
+            [5.9, 1.3, 2.3, 8.6, "Iris-setosa"],
+            [4.2, 8.1, 8.6, 9.0, "Iris-versicolor"],
+            [3.8, 11.6, 4.0, 3.0, "Iris-versicolor"],
+            [6.0, 7.3, 12.7, 2.8, "Iris-virginica"],
+            [10.3, 5.8, 1.5, 7.7, "Iris-virginica"],
+        ]
+
+        test_conts = dp._format_types(unformated_conts)
+
+        self.assertEqual(expected_formatted_conts, test_conts)
+
+    def test_type_converts_2(self) -> None:
+        """Converts all entries within rows to it's appropriate types. Contains
+        bools and integers"""
+
+        unformated_conts = [
+            ["6.4", "8.4", "2.2", "6", "Iris-setosa"],
+            ["5.9", "1.3", "2.3", "8", "Iris-setosa"],
+            ["4.2", "8.1", "8.6", "9", "Iris-versicolor"],
+            ["3.8", "11.6", "true", "3.0", "Iris-versicolor"],
+            ["6.0", "7.3", "False", "2.8", "Iris-virginica"],
+            ["10.3", "5.8", "True", "7.7", "Iris-virginica"],
+        ]
+
+        expected_formatted_conts = [
+            [6.4, 8.4, 2.2, 6, "Iris-setosa"],
+            [5.9, 1.3, 2.3, 8, "Iris-setosa"],
+            [4.2, 8.1, 8.6, 9, "Iris-versicolor"],
+            [3.8, 11.6, True, 3.0, "Iris-versicolor"],
+            [6.0, 7.3, False, 2.8, "Iris-virginica"],
+            [10.3, 5.8, True, 7.7, "Iris-virginica"],
+        ]
+
+        test_conts = dp._format_types(unformated_conts)
+
+        self.assertEqual(expected_formatted_conts, test_conts)
+
+    def test_loading_datafile(self) -> None:
+        """Tests loading in datafile, and checks if the loaded contents is
+        the same as the expected contents. Check data structure and integrity
+        """
+        data_file_path = "datafile.data"
+        expected_conts = [
+            [6.4, 8.4, 2.2, 6.8, "Iris-setosa"],
+            [5.9, 1.3, 2.3, 8.6, "Iris-setosa"],
+            [4.2, 8.1, 8.6, 9.0, "Iris-versicolor"],
+            [3.8, 11.6, 4.0, 3.0, "Iris-versicolor"],
+            [6.0, 7.3, 12.7, 2.8, "Iris-virginica"],
+            [10.3, 5.8, 1.5, 7.7, "Iris-virginica"],
+        ]
+
+        loaded_conts = dp.read_data_file(data_file_path)
+        self.assertEqual(expected_conts, loaded_conts)
+
+    def test_load_datafile_not_exists(self) -> None:
+        """Checks for exceptions if the file does not exists"""
+        file_not_exist = "notafile.data"
+        self.assertRaises(FileNotFoundError, dp.read_data_file, file_not_exist)
+
+    def test_load_datafile_no_permission(self) -> None:
+        """Checks for exceptions if datafile has no permission"""
+        no_perm_file = "datafile_no_perm.data"
+        self.assertRaises(PermissionError, dp.read_data_file, no_perm_file)
+
     def test_writing_random_matrix(self) -> None:
         """Writing a matrix into file"""
 
@@ -189,18 +294,51 @@ class TestMatrixGeneration(unittest.TestCase):
     def setUp(cls) -> None:
 
         # generating file names
-        cls.single_mat = "single_mat.pickle"
         cls.file_exists = "file_exists.csv"
-
-        # generating datasets
-        with open(cls.single_mat, "wb") as mat_file:
-            mat = np.random.rand(10, 10)
-            pickle.dump(mat, mat_file)
+        cls.file_no_permission = "datafile_no_perm.data"
+        cls.datafile = "datafile.data"
 
         # generates an empty file
         with open(cls.file_exists, "w") as f:
             f.write("file exists")
 
+        # generate subset of iris datafile
+        with open(cls.datafile, "w") as f:
+
+            # settings seed for controlled randomization
+            random.seed(42)
+
+            # generating random data
+            species = ["Iris-setosa", "Iris-versicolor", "Iris-virginica"]
+            for species_name in species:
+
+                # generating two random entries
+                for _ in range(2):
+
+                    # create random entry array
+                    rand_entries = [
+                        round(random.random() * 10 + random.randint(0, 3), 1)
+                        for _ in range(4)
+                    ]
+
+                    # stringify entry array
+                    entries_str = ",".join(
+                        [str(rand_entry) for rand_entry in rand_entries]
+                    )
+
+                    # add species name
+                    complete_entry_str = f"{entries_str},{species_name}\n"
+
+                    # store stringified entries
+                    f.write(complete_entry_str)
+
+        # create a file with no write permission
+        with open(cls.file_no_permission, "w") as f:
+            f.write("data")
+            os.chmod(cls.file_no_permission, 111)
+
     @classmethod
     def tearDown(cls) -> None:
-        os.remove(cls.single_mat)
+        os.remove(cls.file_exists)
+        os.remove(cls.datafile)
+        os.remove(cls.file_no_permission)
