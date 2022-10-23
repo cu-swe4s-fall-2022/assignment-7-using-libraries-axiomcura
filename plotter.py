@@ -58,21 +58,24 @@ def create_iris_boxplot(iris_df: pd.DataFrame, outname: str) -> None:
     # saving plot
     plt.savefig(outname)
 
+    return(ax)
 
-def petal_width_v_length_scatter(iris_df: pd.DataFrame, outname: str) -> None:
-    """_summary_
+
+def petal_width_v_length_scatter(iris_df: pd.DataFrame, outname: str) -> plt.Axes:
+    """Creates a scatter plot that compares all sepal widths across all species
+    . Returns axis object that contains all the plot data.
 
     Parameters
     ----------
     iris_df : pd.DataFrame
-        _description_
+        data frame containing iris data
     outname : str
-        _description_
+        name of generated image output
 
     Return
     ------
-    None
-        Generates an image file
+    plt.Axes
+        axis object
 
     Raises
     ------
@@ -81,17 +84,14 @@ def petal_width_v_length_scatter(iris_df: pd.DataFrame, outname: str) -> None:
     ValueError
         raised if expected column values do not match from extracted data
     """
-
     # type checking
     if not isinstance(iris_df, pd.DataFrame):
         raise TypeError("Iris data must be a pandas dataframe")
     if not isinstance(outname, str):
         raise TypeError(f"outname must be a string, not {type(outname)}")
 
-    # setting up subplots
-    fig, ax = plt.subplots()
-
     # plotting data based on species
+    fig, ax = plt.subplots()
     species = iris_df["iris_species"].unique().tolist()
     for species_name in species:
         iris_subset = iris_df[iris_df["iris_species"] == species_name]
@@ -109,3 +109,5 @@ def petal_width_v_length_scatter(iris_df: pd.DataFrame, outname: str) -> None:
 
     # saving plot
     plt.savefig(outname)
+
+    return (ax)
