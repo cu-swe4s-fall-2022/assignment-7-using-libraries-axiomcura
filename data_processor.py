@@ -1,5 +1,6 @@
 from pathlib import Path
-from tkinter import N
+from typing import List
+
 import numpy as np
 
 
@@ -110,3 +111,56 @@ def write_matrix_to_file(
     print(f"File saved in: {str(save_path.absolute())}")
 
     return None
+
+
+#------------------------------
+# additional functions
+#------------------------------
+def read_data_file(path: str) -> List[str]:
+    """Loads contents from iris data file as a list.
+
+    Parameters
+    ----------
+    path : str
+        path to datafile
+
+    Returns
+    -------
+    List[str]
+        contents within data file as a list
+
+    Raises
+    FileNotFoundError:
+        Raised when a provided path points to a non-existing file
+    PermissionError
+        Raised if you do not have read permissions.
+    RuntimeError
+        raised if an unexpected error captured
+    """
+
+    path_obj = Path(path)
+    if not path_obj.is_file():
+        raise FileNotFoundError(f"{path} does not exist.")
+
+    try:
+        data_entries = []
+        with open(path_obj, "r") as infile:
+            iris_data = []
+            for row in infile:
+                entries = row.rstrip("\n").split(",")
+
+                # remove rows with no data
+                if len(entries) == 1:
+                    continue
+
+                # store data
+                data_entries.append(entries)
+
+    except PermissionError:
+        raise PermissionError(
+            f"You do not have permissions to read {path} file"
+        )
+    except Exception:
+        raise RuntimeError("Unexpected error captured when loading file")
+
+    return data_entries
