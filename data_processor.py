@@ -4,6 +4,7 @@ from typing import Any
 from typing import Union
 
 import numpy as np
+import pandas as pd
 
 
 def get_random_matrix(num_rows: int, num_columns: int) -> np.ndarray:
@@ -222,4 +223,7 @@ def read_data_file(path: str) -> List[str]:
     # formatting entries to appropiate types
     data_entries = _format_types(data_entries)
 
-    return data_entries
+    # convert into pandas dataframe
+    col_idx = ["sepal_width", "sepal_length", "petal_width", "petal_length", "iris_species"]
+    iris_df = pd.DataFrame(data=data_entries, columns=col_idx)
+    return iris_df
