@@ -1,3 +1,5 @@
+from pathlib import Path
+from tkinter import N
 import numpy as np
 
 
@@ -48,5 +50,63 @@ def get_file_dimensions(file_name):
     return (0, 0)
 
 
-def write_matrix_to_file(num_rows, num_columns, file_name):
+def write_matrix_to_file(
+    num_rows: int, num_columns: int, file_name: str
+) -> None:
+    """Generates a matrix based on given number of columns and rows. The matrix
+    is is then written out into your a file in your current directory.
+
+    Parameters
+    ----------
+    num_rows : int
+        number of rows for your matrix
+    num_columns : int
+        number of columns for your matrix
+    file_name : str
+        name of the output file containing generated matrix
+
+    Returns
+    -------
+    None
+        Generates a matrix file in current directory
+
+    Raises:
+    -------
+    FileExistsError:
+        Raised if the file name exists.
+
+    Errors raised come from from the `get_random_matrix()` function:
+    TypeError
+        Raised if either num_rows or num_columns are not integer types
+    ValueError
+        Raised if either num_rows or num_columns are less than 0
+    """
+
+    # generate matrix
+    matrix = get_random_matrix(num_rows=num_rows, num_columns=num_columns)
+
+    # create save path object
+    save_path = Path(".") / f"{file_name}.csv"
+
+    # to prevent overwriting, we check if the file exists, if so raise error
+    if save_path.is_file():
+        raise FileExistsError(f"{save_path.name} already exists.")
+
+    # writing csv file
+    with open(save_path, "w") as out_file:
+
+        # iterating each row and converting it into a string. Stringed array
+        # is written into a file
+        for row in matrix:
+
+            # convert array into string type
+            row_data_str = ",".join(str(i) for i in row.tolist())
+
+            # write into file
+            file_conts = f"{row_data_str}\n"
+            out_file.write(file_conts)
+
+    # printing message where the file is saved
+    print(f"File saved in: {str(save_path.absolute())}")
+
     return None
