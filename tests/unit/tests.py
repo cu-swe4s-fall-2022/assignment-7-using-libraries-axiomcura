@@ -185,8 +185,6 @@ class TestMatrixGeneration(unittest.TestCase):
             FileExistsError, dp.write_matrix_to_file, n_rows, n_cols, fname
         )
 
-
-
     @classmethod
     def setUp(cls) -> None:
 
@@ -202,7 +200,6 @@ class TestMatrixGeneration(unittest.TestCase):
         # generates an empty file
         with open(cls.file_exists, "w") as f:
             f.write("file exists")
-
 
     @classmethod
     def tearDown(cls) -> None:
