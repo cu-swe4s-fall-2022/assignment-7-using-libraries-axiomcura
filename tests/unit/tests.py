@@ -1,3 +1,4 @@
+import os
 import pickle
 import unittest
 
@@ -15,7 +16,7 @@ class TestMatrixGeneration(unittest.TestCase):
         n_cols = 10
 
         # loading true matrix
-        with open("single_mat.pickle", "wb") as f:
+        with open("single_mat.pickle", "rb") as f:
             true_mat = pickle.load(f)
 
         # generating test matrix
@@ -101,6 +102,7 @@ class TestMatrixGeneration(unittest.TestCase):
 
             # if the a float type is present, check for exception raises
             if floats_exists is True:
+                print("Float type found, testing exception handling")
 
                 # reset float exist state
                 floats_exists = False
@@ -111,7 +113,6 @@ class TestMatrixGeneration(unittest.TestCase):
                 )
 
             else:
-
                 # setting truths
                 true_shape = (n_rows, n_cols)
                 true_type_str = "<class 'numpy.ndarray'>"
@@ -124,7 +125,6 @@ class TestMatrixGeneration(unittest.TestCase):
                 self.assertEqual(true_shape, test_shape)
                 self.assertEqual(true_type_str, test_type_str)
 
-
     @classmethod
     def setUp(cls) -> None:
 
@@ -135,3 +135,7 @@ class TestMatrixGeneration(unittest.TestCase):
         with open(cls.single_mat, "wb") as mat_file:
             mat = np.random.rand(10, 10)
             pickle.dump(mat, mat_file)
+
+    @classmethod
+    def tearDown(cls) -> None:
+        os.remove(cls.single_mat)
