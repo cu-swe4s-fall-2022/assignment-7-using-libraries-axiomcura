@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 import data_processor as dp
 
@@ -209,6 +210,15 @@ class TestIO(unittest.TestCase):
         the same as the expected contents. Check data structure and integrity
         """
         data_file_path = "datafile.data"
+
+        cols = [
+            "sepal_width",
+            "sepal_length",
+            "petal_width",
+            "petal_length",
+            "iris_species",
+        ]
+
         expected_conts = [
             [6.4, 8.4, 2.2, 6.8, "Iris-setosa"],
             [5.9, 1.3, 2.3, 8.6, "Iris-setosa"],
@@ -218,8 +228,19 @@ class TestIO(unittest.TestCase):
             [10.3, 5.8, 1.5, 7.7, "Iris-virginica"],
         ]
 
+        expected_df = pd.DataFrame(data=expected_conts, columns=cols)
+        expected_types = expected_df.dtypes.values.tolist()
+
+        #
         loaded_conts = dp.read_data_file(data_file_path)
-        self.assertEqual(expected_conts, loaded_conts)
+        test_types = loaded_conts.dtypes.values.tolist()
+
+        # checking contents, types, and column names
+        self.assertEqual(
+            expected_df.values.tolist(), loaded_conts.values.tolist()
+        )
+        self.assertEqual(expected_types, test_types)
+        self.assertEqual(cols, loaded_conts.columns.tolist())
 
     def test_load_datafile_not_exists(self) -> None:
         """Checks for exceptions if the file does not exists"""
