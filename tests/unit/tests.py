@@ -1,4 +1,5 @@
 import os
+import hashlib
 import pickle
 import random
 import unittest
@@ -8,6 +9,7 @@ import numpy as np
 import pandas as pd
 
 import data_processor as dp
+import plotter as pl
 
 
 class TestMatrixGeneration(unittest.TestCase):
@@ -310,6 +312,78 @@ class TestIO(unittest.TestCase):
         self.assertRaises(
             FileExistsError, dp.write_matrix_to_file, n_rows, n_cols, fname
         )
+
+    def test_barplot(self) -> None:
+        """Creates a plot and generates a md5 hash. Compares md5 hashes for
+        data integrity
+        """
+        data_file_path = "datafile.data"
+
+        cols = [
+            "sepal_width",
+            "sepal_length",
+            "petal_width",
+            "petal_length",
+            "iris_species",
+        ]
+
+        conts = [
+            [6.4, 8.4, 2.2, 6.8, "Iris-setosa"],
+            [5.9, 1.3, 2.3, 8.6, "Iris-setosa"],
+            [4.2, 8.1, 8.6, 9.0, "Iris-versicolor"],
+            [3.8, 11.6, 4.0, 3.0, "Iris-versicolor"],
+            [6.0, 7.3, 12.7, 2.8, "Iris-virginica"],
+            [10.3, 5.8, 1.5, 7.7, "Iris-virginica"],
+        ]
+
+        iris_df = pd.DataFrame(data=conts, columns=cols)
+
+        pl.create_iris_boxplot(iris_df, outname="testplot")
+
+        # hashing generated plot (check for data integrity)
+        expected_hash = "1f611fe69e7df7b0c9f2846362ed7e4b"
+        test_hash = hashlib.md5("testplot.png".encode("UTF-8")).hexdigest()
+        os.remove("testplot.png")
+        self.assertEqual(expected_hash, test_hash)
+
+    def test_non_string_outname(self) -> None:
+        """Checks for exceptions if a non-string outname was provided"""
+        data_file_path = "datafile.data"
+
+        cols = [
+            "sepal_width",
+            "sepal_length",
+            "petal_width",
+            "petal_length",
+            "iris_species",
+        ]
+
+        conts = [
+            [6.4, 8.4, 2.2, 6.8, "Iris-setosa"],
+            [5.9, 1.3, 2.3, 8.6, "Iris-setosa"],
+            [4.2, 8.1, 8.6, 9.0, "Iris-versicolor"],
+            [3.8, 11.6, 4.0, 3.0, "Iris-versicolor"],
+            [6.0, 7.3, 12.7, 2.8, "Iris-virginica"],
+            [10.3, 5.8, 1.5, 7.7, "Iris-virginica"],
+        ]
+
+        iris_df = pd.DataFrame(data=conts, columns=cols)
+
+        self.assertRaises(TypeError, pl.create_iris_boxplot, iris_df, 1)
+
+    def test_non_df_boxplot(self) -> None:
+        """Checks for exceptions if a non dataframe is passed"""
+
+        conts = [
+            [6.4, 8.4, 2.2, 6.8, "Iris-setosa"],
+            [5.9, 1.3, 2.3, 8.6, "Iris-setosa"],
+            [4.2, 8.1, 8.6, 9.0, "Iris-versicolor"],
+            [3.8, 11.6, 4.0, 3.0, "Iris-versicolor"],
+            [6.0, 7.3, 12.7, 2.8, "Iris-virginica"],
+            [10.3, 5.8, 1.5, 7.7, "Iris-virginica"],
+        ]
+
+        self.assertRaises(TypeError, pl.create_iris_boxplot, conts, "testplot")
 
     @classmethod
     def setUp(cls) -> None:
