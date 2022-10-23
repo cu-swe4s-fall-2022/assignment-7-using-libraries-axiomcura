@@ -1,6 +1,7 @@
 import os
 import pickle
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -125,16 +126,83 @@ class TestMatrixGeneration(unittest.TestCase):
                 self.assertEqual(true_shape, test_shape)
                 self.assertEqual(true_type_str, test_type_str)
 
+    def test_writing_random_matrix(self) -> None:
+        """Writing a matrix into file"""
+
+        # setting input parameters
+        n_rows = 10
+        n_cols = 10
+
+        # create file
+        fname = "test_mat"
+        test_path = Path() / f"{fname}.csv"
+
+        # write out matrix
+        dp.write_matrix_to_file(n_rows, n_cols, fname)
+
+        # checking if the file exists
+        check_file = test_path.is_file()
+        self.assertTrue(check_file)
+
+        # removing generated file
+        os.remove(str(test_path))
+
+    def test_writing_random_matrix_2(self) -> None:
+        """Writing 100 matrices"""
+
+        for idx in range(100):
+
+            # setting input parameters
+            n_rows = np.random.randint(1, 100)
+            n_cols = np.random.randint(1, 100)
+
+            # create file
+            fname = f"test_mat_{idx}"
+
+            test_path = Path() / f"{fname}.csv"
+
+            # write out matrix
+            dp.write_matrix_to_file(n_rows, n_cols, fname)
+
+            # checking if the file exists
+            check_file = test_path.is_file()
+            self.assertTrue(check_file)
+
+            # removing generated file
+            os.remove(str(test_path))
+
+    def test_file_exists(self) -> None:
+        """Test whether a file exists"""
+
+        # setting input parameters
+        n_rows = 10
+        n_cols = 10
+
+        # create file
+        fname = "file_exists"
+
+        self.assertRaises(
+            FileExistsError, dp.write_matrix_to_file, n_rows, n_cols, fname
+        )
+
+
+
     @classmethod
     def setUp(cls) -> None:
 
         # generating file names
         cls.single_mat = "single_mat.pickle"
+        cls.file_exists = "file_exists.csv"
 
         # generating datasets
         with open(cls.single_mat, "wb") as mat_file:
             mat = np.random.rand(10, 10)
             pickle.dump(mat, mat_file)
+
+        # generates an empty file
+        with open(cls.file_exists, "w") as f:
+            f.write("file exists")
+
 
     @classmethod
     def tearDown(cls) -> None:
