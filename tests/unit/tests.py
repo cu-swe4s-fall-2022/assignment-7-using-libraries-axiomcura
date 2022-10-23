@@ -1,5 +1,5 @@
-import os
 import hashlib
+import os
 import pickle
 import random
 import unittest
@@ -313,6 +313,61 @@ class TestIO(unittest.TestCase):
             FileExistsError, dp.write_matrix_to_file, n_rows, n_cols, fname
         )
 
+    @classmethod
+    def setUp(cls) -> None:
+
+        # generating file names
+        cls.file_exists = "file_exists.csv"
+        cls.file_no_permission = "datafile_no_perm.data"
+        cls.datafile = "datafile.data"
+
+        # generates an empty file
+        with open(cls.file_exists, "w") as f:
+            f.write("file exists")
+
+        # generate subset of iris datafile
+        with open(cls.datafile, "w") as f:
+
+            # settings seed for controlled randomization
+            random.seed(42)
+
+            # generating random data
+            species = ["Iris-setosa", "Iris-versicolor", "Iris-virginica"]
+            for species_name in species:
+
+                # generating two random entries
+                for _ in range(2):
+
+                    # create random entry array
+                    rand_entries = [
+                        round(random.random() * 10 + random.randint(0, 3), 1)
+                        for _ in range(4)
+                    ]
+
+                    # stringify entry array
+                    entries_str = ",".join(
+                        [str(rand_entry) for rand_entry in rand_entries]
+                    )
+
+                    # add species name
+                    complete_entry_str = f"{entries_str},{species_name}\n"
+
+                    # store stringified entries
+                    f.write(complete_entry_str)
+
+        # create a file with no write permission
+        with open(cls.file_no_permission, "w") as f:
+            f.write("data")
+            os.chmod(cls.file_no_permission, 111)
+
+    @classmethod
+    def tearDown(cls) -> None:
+        os.remove(cls.file_exists)
+        os.remove(cls.datafile)
+        os.remove(cls.file_no_permission)
+
+
+class TestPlotter(unittest.TestCase):
     def test_barplot(self) -> None:
         """Creates a plot and generates a md5 hash. Compares md5 hashes for
         data integrity
@@ -385,55 +440,78 @@ class TestIO(unittest.TestCase):
 
         self.assertRaises(TypeError, pl.create_iris_boxplot, conts, "testplot")
 
-    @classmethod
-    def setUp(cls) -> None:
+    def test_scatter(self) -> None:
+        """Creates a plot and generates a md5 hash. Compares md5 hashes for
+        data integrity
+        """
+        data_file_path = "datafile.data"
 
-        # generating file names
-        cls.file_exists = "file_exists.csv"
-        cls.file_no_permission = "datafile_no_perm.data"
-        cls.datafile = "datafile.data"
+        cols = [
+            "sepal_width",
+            "sepal_length",
+            "petal_width",
+            "petal_length",
+            "iris_species",
+        ]
 
-        # generates an empty file
-        with open(cls.file_exists, "w") as f:
-            f.write("file exists")
+        conts = [
+            [6.4, 8.4, 2.2, 6.8, "Iris-setosa"],
+            [5.9, 1.3, 2.3, 8.6, "Iris-setosa"],
+            [4.2, 8.1, 8.6, 9.0, "Iris-versicolor"],
+            [3.8, 11.6, 4.0, 3.0, "Iris-versicolor"],
+            [6.0, 7.3, 12.7, 2.8, "Iris-virginica"],
+            [10.3, 5.8, 1.5, 7.7, "Iris-virginica"],
+        ]
 
-        # generate subset of iris datafile
-        with open(cls.datafile, "w") as f:
+        iris_df = pd.DataFrame(data=conts, columns=cols)
 
-            # settings seed for controlled randomization
-            random.seed(42)
+        pl.petal_width_v_length_scatter(iris_df, outname="testscatter")
 
-            # generating random data
-            species = ["Iris-setosa", "Iris-versicolor", "Iris-virginica"]
-            for species_name in species:
+        # hashing generated plot (check for data integrity)
+        expected_hash = "a405e5fdced63a0ebec851dfd5a66532"
+        test_hash = hashlib.md5("testscatter.png".encode("UTF-8")).hexdigest()
+        os.remove("testscatter.png")
+        self.assertEqual(expected_hash, test_hash)
 
-                # generating two random entries
-                for _ in range(2):
+    def test_non_string_name_scatter(self) -> None:
+        """Checks for exceptions if a non-string outname was provided"""
+        data_file_path = "datafile.data"
 
-                    # create random entry array
-                    rand_entries = [
-                        round(random.random() * 10 + random.randint(0, 3), 1)
-                        for _ in range(4)
-                    ]
+        cols = [
+            "sepal_width",
+            "sepal_length",
+            "petal_width",
+            "petal_length",
+            "iris_species",
+        ]
 
-                    # stringify entry array
-                    entries_str = ",".join(
-                        [str(rand_entry) for rand_entry in rand_entries]
-                    )
+        conts = [
+            [6.4, 8.4, 2.2, 6.8, "Iris-setosa"],
+            [5.9, 1.3, 2.3, 8.6, "Iris-setosa"],
+            [4.2, 8.1, 8.6, 9.0, "Iris-versicolor"],
+            [3.8, 11.6, 4.0, 3.0, "Iris-versicolor"],
+            [6.0, 7.3, 12.7, 2.8, "Iris-virginica"],
+            [10.3, 5.8, 1.5, 7.7, "Iris-virginica"],
+        ]
 
-                    # add species name
-                    complete_entry_str = f"{entries_str},{species_name}\n"
+        iris_df = pd.DataFrame(data=conts, columns=cols)
 
-                    # store stringified entries
-                    f.write(complete_entry_str)
+        self.assertRaises(
+            TypeError, pl.petal_width_v_length_scatter, iris_df, 1
+        )
 
-        # create a file with no write permission
-        with open(cls.file_no_permission, "w") as f:
-            f.write("data")
-            os.chmod(cls.file_no_permission, 111)
+    def test_non_df_scatter(self) -> None:
+        """Checks for exceptions if a non dataframe is passed"""
 
-    @classmethod
-    def tearDown(cls) -> None:
-        os.remove(cls.file_exists)
-        os.remove(cls.datafile)
-        os.remove(cls.file_no_permission)
+        conts = [
+            [6.4, 8.4, 2.2, 6.8, "Iris-setosa"],
+            [5.9, 1.3, 2.3, 8.6, "Iris-setosa"],
+            [4.2, 8.1, 8.6, 9.0, "Iris-versicolor"],
+            [3.8, 11.6, 4.0, 3.0, "Iris-versicolor"],
+            [6.0, 7.3, 12.7, 2.8, "Iris-virginica"],
+            [10.3, 5.8, 1.5, 7.7, "Iris-virginica"],
+        ]
+
+        self.assertRaises(
+            TypeError, pl.petal_width_v_length_scatter, conts, "testscatter"
+        )
