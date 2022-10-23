@@ -1,5 +1,7 @@
 from pathlib import Path
 from typing import List
+from typing import Any
+from typing import Union
 
 import numpy as np
 
@@ -113,9 +115,63 @@ def write_matrix_to_file(
     return None
 
 
-#------------------------------
+# ------------------------------
 # additional functions
-#------------------------------
+# ------------------------------
+def _format_types(
+    data_content: List[str],
+) -> List[Union[Union[float, int], str]]:
+    """Converts string contents to it's appropriate format.
+
+    Parameters
+    ----------
+    data_content : List[Any]
+        extracted contents from iris data file
+
+    Returns
+    -------
+    List[Union[Union[float, int], str]]
+        list of appropriately typed data entries.
+    """
+
+    formmated_data_entries = []
+    for row in data_content:
+
+        formatted_row_entries = []
+        for entry in row:
+
+            # check if it is a integer
+            if entry.isdigit():
+                entry = int(entry)
+                formatted_row_entries.append(entry)
+                continue
+
+            # checking if float
+            try:
+                entry = float(entry)
+                formatted_row_entries.append(entry)
+
+            # if value error is raised, then it is a string or bool
+            except ValueError:
+
+                # checking if it is a bool
+                # -- eval checks for python attributes, functions and methods
+                # -- in string format
+                # eval("False") -> False #bool object from string
+                try:
+                    entry = eval(entry.capitalize())
+                    formatted_row_entries.append(entry)
+
+                # if NameError is caught, then it is a string
+                except NameError:
+                    entry = str(entry)
+                    formatted_row_entries.append(entry)
+
+        formmated_data_entries.append(formatted_row_entries)
+
+    return formmated_data_entries
+
+
 def read_data_file(path: str) -> List[str]:
     """Loads contents from iris data file as a list.
 
@@ -162,5 +218,8 @@ def read_data_file(path: str) -> List[str]:
         )
     except Exception:
         raise RuntimeError("Unexpected error captured when loading file")
+
+    # formatting entries to appropiate types
+    data_entries = _format_types(data_entries)
 
     return data_entries
