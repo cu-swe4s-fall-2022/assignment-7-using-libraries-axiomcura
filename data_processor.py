@@ -220,7 +220,7 @@ def read_data_file(path: str) -> List[str]:
     except Exception:
         raise RuntimeError("Unexpected error captured when loading file")
 
-    # formatting entries to appropiate types
+    # formatting entries to appropriate types
     data_entries = _format_types(data_entries)
 
     # convert into pandas dataframe
