@@ -393,13 +393,17 @@ class TestPlotter(unittest.TestCase):
 
         iris_df = pd.DataFrame(data=conts, columns=cols)
 
-        pl.create_iris_boxplot(iris_df, outname="testplot")
+        ax = pl.create_iris_boxplot(iris_df, outname="testplot")
+        test_type = str(type(ax))
+        expected_type = "<class 'matplotlib.axes._subplots.AxesSubplot'>"
 
         # hashing generated plot (check for data integrity)
         expected_hash = "1f611fe69e7df7b0c9f2846362ed7e4b"
         test_hash = hashlib.md5("testplot.png".encode("UTF-8")).hexdigest()
         os.remove("testplot.png")
+
         self.assertEqual(expected_hash, test_hash)
+        self.assertEqual(test_type, expected_type)
 
     def test_non_string_outname(self) -> None:
         """Checks for exceptions if a non-string outname was provided"""
@@ -465,13 +469,17 @@ class TestPlotter(unittest.TestCase):
 
         iris_df = pd.DataFrame(data=conts, columns=cols)
 
-        pl.petal_width_v_length_scatter(iris_df, outname="testscatter")
+        ax = pl.petal_width_v_length_scatter(iris_df, outname="testscatter")
+        test_type = str(type(ax))
+        expected_type = "<class 'matplotlib.axes._subplots.AxesSubplot'>"
 
         # hashing generated plot (check for data integrity)
         expected_hash = "a405e5fdced63a0ebec851dfd5a66532"
         test_hash = hashlib.md5("testscatter.png".encode("UTF-8")).hexdigest()
         os.remove("testscatter.png")
+
         self.assertEqual(expected_hash, test_hash)
+        self.assertEqual(expected_type, test_type)
 
     def test_non_string_name_scatter(self) -> None:
         """Checks for exceptions if a non-string outname was provided"""
