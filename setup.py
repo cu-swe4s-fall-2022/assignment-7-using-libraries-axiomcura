@@ -6,6 +6,7 @@ setup(
     name="DataProc",
     version="0.0.1",
     author="Erik Serrano",
-    description="Processess tabular dataset",
+    description="Processes tabular dataset",
     packages=find_packages(),
+    scripts=["plotter.py"]
 )
