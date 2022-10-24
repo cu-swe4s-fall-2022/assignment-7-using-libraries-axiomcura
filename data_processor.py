@@ -8,7 +8,8 @@ import pandas as pd
 
 
 def get_random_matrix(num_rows: int, num_columns: int) -> np.ndarray:
-    """Generates a random matrix that is sampled from a uniform range (0, 1] with
+    """Generates a random matrix that is sampled from a uniform range (0, 1]
+    with
 
     Parameters:
     ----------
@@ -224,6 +225,12 @@ def read_data_file(path: str) -> List[str]:
     data_entries = _format_types(data_entries)
 
     # convert into pandas dataframe
-    col_idx = ["sepal_width", "sepal_length", "petal_width", "petal_length", "iris_species"]
+    col_idx = [
+        "sepal_width",
+        "sepal_length",
+        "petal_width",
+        "petal_length",
+        "iris_species",
+    ]
     iris_df = pd.DataFrame(data=data_entries, columns=col_idx)
     return iris_df

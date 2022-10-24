@@ -7,5 +7,5 @@ setup(
     version="0.0.1",
     author="Erik Serrano",
     description="Processess tabular dataset",
-    packages=find_packages()
+    packages=find_packages(),
 )
