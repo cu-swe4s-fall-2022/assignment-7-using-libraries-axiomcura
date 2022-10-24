@@ -546,11 +546,15 @@ class TestPlotter(unittest.TestCase):
 
         iris_df = pd.DataFrame(data=conts, columns=cols)
 
-        ax = pl.merged_boxplot_and_scatter(iris_df, outname="merged_scatter_and_boxplot")
+        ax = pl.merged_boxplot_and_scatter(
+            iris_df, outname="merged_scatter_and_boxplot"
+        )
 
         # hashing generated plot (check for data integrity)
         expected_hash = "93b4e84d9124109fbf7f5604f6bb9d82"
-        test_hash = hashlib.md5("merged_scatter_and_boxplot.png".encode("UTF-8")).hexdigest()
+        test_hash = hashlib.md5(
+            "merged_scatter_and_boxplot.png".encode("UTF-8")
+        ).hexdigest()
         os.remove("merged_scatter_and_boxplot.png")
 
         self.assertEqual(expected_hash, test_hash)
