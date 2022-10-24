@@ -523,3 +523,34 @@ class TestPlotter(unittest.TestCase):
         self.assertRaises(
             TypeError, pl.petal_width_v_length_scatter, conts, "testscatter"
         )
+
+    def test_merge_plot(self) -> None:
+        """Test production of merge plot"""
+
+        cols = [
+            "sepal_width",
+            "sepal_length",
+            "petal_width",
+            "petal_length",
+            "iris_species",
+        ]
+
+        conts = [
+            [6.4, 8.4, 2.2, 6.8, "Iris-setosa"],
+            [5.9, 1.3, 2.3, 8.6, "Iris-setosa"],
+            [4.2, 8.1, 8.6, 9.0, "Iris-versicolor"],
+            [3.8, 11.6, 4.0, 3.0, "Iris-versicolor"],
+            [6.0, 7.3, 12.7, 2.8, "Iris-virginica"],
+            [10.3, 5.8, 1.5, 7.7, "Iris-virginica"],
+        ]
+
+        iris_df = pd.DataFrame(data=conts, columns=cols)
+
+        ax = pl.merged_boxplot_and_scatter(iris_df, outname="merged_scatter_and_boxplot")
+
+        # hashing generated plot (check for data integrity)
+        expected_hash = "93b4e84d9124109fbf7f5604f6bb9d82"
+        test_hash = hashlib.md5("merged_scatter_and_boxplot.png".encode("UTF-8")).hexdigest()
+        os.remove("merged_scatter_and_boxplot.png")
+
+        self.assertEqual(expected_hash, test_hash)
