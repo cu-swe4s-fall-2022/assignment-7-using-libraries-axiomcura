@@ -1,0 +1,49 @@
+name: test_program
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  code_style:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: DataProc
+          environment-file: environment.yaml
+      - run: pycodestyle $(git ls-files "*.py")
+
+  run_unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: DataProc
+          environment-file: environment.yaml
+      - run: |
+          pip install -e .
+          cd tests/unit
+          python -m unittest test
+
+  functional_tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: DataProc
+          environment-file: environment.yaml
+      - run: |
+          pip install -e .
+          cd tests/functional
+          bash run_functional_testing.sh

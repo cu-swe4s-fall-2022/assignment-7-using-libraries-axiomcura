@@ -1,0 +1,9 @@
+name: DataProc
+dependencies:
+  - python=3.10
+  - pip
+  - matplotlib
+  - numpy
+  - pandas
+  - pip:
+    - pycodestyle
