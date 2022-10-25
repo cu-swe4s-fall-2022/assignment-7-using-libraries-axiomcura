@@ -176,7 +176,7 @@ def merged_boxplot_and_scatter(
 
 
 def display_exception(e: BaseException) -> None:
-    """Displays error in terminal and appropriately exist the program
+    """Displays error in terminal and appropriately exit the program
 
     Parameters
     ----------
@@ -251,7 +251,7 @@ def main() -> int:
 
     # -- generate merged boxplot and scatter plot in one figure
     try:
-        merged_boxplot_and_scatter(iris_df=iris_df, outname=scatter_outname)
+        merged_boxplot_and_scatter(iris_df=iris_df, outname=merge_outname)
     except Exception as e:
         display_exception(e)
 
