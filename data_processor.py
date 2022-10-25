@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Tuple
 from typing import List
 from typing import Any
 from typing import Union
@@ -51,8 +52,34 @@ def get_random_matrix(num_rows: int, num_columns: int) -> np.ndarray:
     return matrix
 
 
-def get_file_dimensions(file_name):
-    return (0, 0)
+def get_file_dimensions(file_name: str) -> Tuple[int]:
+    """_summary_
+
+    Parameters
+    ----------
+    file_name : str
+        string path that points to iris data file
+
+    Returns
+    -------
+    Tuple[int]
+        Returns the shape of the datafile (n_rows, n_columns)
+
+    Raises
+    ------
+    Errors raised from `read_data_file()` function
+
+    FileNotFoundError:
+        Raised when a provided path points to a non-existing file
+    PermissionError
+        Raised if you do not have read permissions.
+    RuntimeError
+        raised if an unexpected error captured
+    """
+
+    # reading file and getting shape
+    shape = read_data_file(file_name).shape
+    return shape
 
 
 def write_matrix_to_file(
@@ -136,7 +163,7 @@ def _format_types(
         list of appropriately typed data entries.
     """
 
-    formmated_data_entries = []
+    formatted_data_entries = []
     for row in data_content:
 
         formatted_row_entries = []
@@ -169,9 +196,9 @@ def _format_types(
                     entry = str(entry)
                     formatted_row_entries.append(entry)
 
-        formmated_data_entries.append(formatted_row_entries)
+        formatted_data_entries.append(formatted_row_entries)
 
-    return formmated_data_entries
+    return formatted_data_entries
 
 
 def read_data_file(path: str) -> List[str]:
