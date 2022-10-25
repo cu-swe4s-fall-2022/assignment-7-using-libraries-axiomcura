@@ -313,6 +313,22 @@ class TestIO(unittest.TestCase):
             FileExistsError, dp.write_matrix_to_file, n_rows, n_cols, fname
         )
 
+    def test_shape(self) -> None:
+        """Test weather we can get the shape of file"""
+        csv_file = "datafile.data"
+
+        expected_shape = (6, 5)
+        test_shape = dp.get_file_dimensions(csv_file)
+        self.assertEqual(test_shape, expected_shape)
+
+    def test_shape_file_not_exists(self) -> None:
+        """Tests file not found exception in get_file_dimensions"""
+
+        non_existing_file = "no_exists.csv"
+        self.assertRaises(
+            FileNotFoundError, dp.get_file_dimensions, non_existing_file
+        )
+
     @classmethod
     def setUp(cls) -> None:
 
