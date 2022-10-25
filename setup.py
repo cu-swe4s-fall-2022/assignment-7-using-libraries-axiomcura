@@ -8,5 +8,5 @@ setup(
     author="Erik Serrano",
     description="Processes tabular dataset",
     packages=find_packages(),
-    scripts=["plotter.py"]
+    scripts=["plotter.py"],
 )
