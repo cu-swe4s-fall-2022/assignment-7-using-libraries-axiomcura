@@ -3,6 +3,7 @@
 `DataProc` is a simple program that takes in data from the iris dataset.
 
 It generates 3 plots:
+
 - **iris box plots**: compares sepal width and length across all flower species.
 - **petal_width_v_length_scatter**: Creates a scatter plot that compares sepal width across all flower species.
 - **merged_boxplot_and_scatter**: Creates a plot that merges the first two plots
@@ -10,6 +11,7 @@ It generates 3 plots:
 ## Release v0.1
 
 We are happy to annouce the first release of `DataProc`! 🙌.
+
 - Contains a `plotter.py` function that takes in iris.data files and generates High res plots
 - Contains a rigorous testing module that checks for data structures and types
 - Arguments required to use this program is simple!
@@ -103,11 +105,9 @@ Below are the generated images:
 
 ![pretty_flowers_boxplot](https://user-images.githubusercontent.com/31600622/197667643-8a32a289-65b7-4c74-a723-9df185156ce3.png)
 
-
 **pretty_flowers_scatterplot.png**
 
 ![pretty_flowers_scatterplot](https://user-images.githubusercontent.com/31600622/197667974-fd710d94-2b63-4a42-8262-789f7e2113c7.png)
-
 
 **pretty_flowers_merged_box_and_scatter.png**
 
